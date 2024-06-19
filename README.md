@@ -51,3 +51,5 @@ $passhash = passauth ? '<value>' : '';
 **License and Disclaimer**
 ----------
 This web shell is licensed under the MIT License, and is provided as-is and without warranty. Use at your own risk. See the `LICENSE` file for details.
+
+! Warning: Contains firewall disabling command, may catch on anti-virus.
