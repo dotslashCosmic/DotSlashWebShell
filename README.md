@@ -30,7 +30,7 @@ $autolog = <value>;
 $passprompt = '<value>';
 $passhash = passauth ? '<value>' : '';
 ```
-4. Upload the `shell.php` file to your web server.
+4. Upload the `shell.php` file to your web server. ($ php -S localhost:8000)
 5. Access the web shell by navigating to `http://yourdomain.com/shell.php` in your web browser.
 
 **Usage**
