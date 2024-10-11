@@ -7,7 +7,7 @@ except ImportError:
     sys.exit(1)
     
 def h(s, salt):
-    return hmac.new(salt.encode(), s.encode(), hashlib.sha512).hexdigest()
+    return hmac.new(salt.encode(), s.encode(), hashlib.sha3_512).hexdigest()
     
 password_auth = input("Do you want to enable password authentication? (y/n): ")
 password_auth = True if password_auth.lower() == 'y' else False
