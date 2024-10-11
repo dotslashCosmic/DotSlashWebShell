@@ -12,9 +12,9 @@ function e($s) {
 function h($s) {
     global $passprompt;
     if (function_exists('hash_hmac')) {
-        return hash_hmac('sha512', $s, $passprompt);
+        return hash_hmac('sha3-512', $s, $passprompt);
     } else {
-        return bin2hex(mhash(MHASH_SHA512, $s, $passprompt));}}
+        return bin2hex(mhash(MHASH_SHA3_512, $s, $passprompt));}}
 function fetch_fopen($host, $port, $src, $dst) {
     global $err, $ok;
     $ret = '';
